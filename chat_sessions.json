@@ -1,0 +1,1254 @@
+{
+  "c807b7f0": {
+    "user_id": "user_1",
+    "created": "2026-03-15T10:40:45.425120",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hi my name is ekansh , i like coffee"
+      },
+      {
+        "role": "assistant",
+        "content": "Hi Ekansh! It's wonderful to meet you! I'm so glad you told me your name. And I'm happy to hear you like coffee \u2013 I like coffee too! That's a great thing to bond over. \u2615",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7112,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": [
+            {
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "type": "corrected_fact"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "content": "Who is Sheila ?"
+      },
+      {
+        "role": "assistant",
+        "content": "I don't think you've told me about Sheila yet. Can you tell me who Sheila is?",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Who is Sheela ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Ah, you're asking about Sheela! You've told me before that Sheela is your crush. Is that right? \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "93a3c16b-da21-4a71-b48a-2e1a2c0e94ab",
+              "text": "user's crush_name is Sheela",
+              "entity": "user",
+              "attribute": "crush_name",
+              "value": "Sheela",
+              "confidence": 1.0,
+              "score": 0.575,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Roly is my mother .."
+      }
+    ]
+  },
+  "7afe0978": {
+    "user_id": "user_1",
+    "created": "2026-03-15T10:43:05.307996",
+    "messages": [
+      {
+        "role": "user",
+        "content": "HI I am user 1 , my name is shubh "
+      },
+      {
+        "role": "user",
+        "content": "kavita is my mother "
+      },
+      {
+        "role": "user",
+        "content": "send me list of veggies which i will like "
+      },
+      {
+        "role": "assistant",
+        "content": "Hi there! It's lovely to meet you, Shubh!\n\nYou know, I actually had a memory that your name was Ekansh, so thank you for clarifying and letting me know it's Shubh now! I'll make sure to remember that. And it's interesting that Kavita is your mother!\n\nRegarding a list of veggies you'd like, I don't think you've told me your preferences for vegetables yet! I'd love to learn what kinds of veggies you enjoy. Once I know a bit about what you like, I can definitely help you with a list in the future!\n\nFor now, I do remember that you like tea and coffee! Are there any specific veggies you already know you enjoy or dislike?",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7103,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Do I have a crush ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes, Shubh! I remember that your crush's name is Sheela.",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "93a3c16b-da21-4a71-b48a-2e1a2c0e94ab",
+              "text": "user's crush_name is Sheela",
+              "entity": "user",
+              "attribute": "crush_name",
+              "value": "Sheela",
+              "confidence": 1.0,
+              "score": 0.7142,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7103,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Do I have gf ??"
+      },
+      {
+        "role": "assistant",
+        "content": "I don't have any memory of you telling me whether you have a girlfriend or not, Shubh.",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7103,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "d2db4275": {
+    "user_id": "user_1",
+    "created": "2026-03-15T10:43:49.791325",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Whom I am , what do I like to drink "
+      },
+      {
+        "role": "assistant",
+        "content": "Hi ekansh! It's nice to chat with you again. Based on what you've told me, you're ekansh, and you really enjoy drinking both tea and coffee! \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.7149,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7112,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "54b62020-af1b-412e-a99c-a2e65f3f4ea4",
+              "text": "user's identity is , what do I like to drink",
+              "entity": "user",
+              "attribute": "identity",
+              "value": ", what do I like to drink",
+              "confidence": 1.0,
+              "score": 0.575,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": [
+            {
+              "entity": "user",
+              "attribute": "identity",
+              "value": ", what do I like to drink",
+              "type": "corrected_fact"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "content": "My crush name is Sheela "
+      },
+      {
+        "role": "assistant",
+        "content": "Oh, Ekansh, it's so nice to chat with you again! I remember you mentioning that your crush's name is Sheela. That's a lovely name! \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "93a3c16b-da21-4a71-b48a-2e1a2c0e94ab",
+              "text": "user's crush_name is Sheela",
+              "entity": "user",
+              "attribute": "crush_name",
+              "value": "Sheela",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.7149,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": [
+            {
+              "entity": "user",
+              "attribute": "crush_name",
+              "value": "Sheela",
+              "type": "user_stated_fact"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "content": "who is Sheela ?"
+      },
+      {
+        "role": "assistant",
+        "content": "As I recall, Ekansh, Sheela is your crush! I don't have any other information about her, just that you have a crush on her. \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "93a3c16b-da21-4a71-b48a-2e1a2c0e94ab",
+              "text": "user's crush_name is Sheela",
+              "entity": "user",
+              "attribute": "crush_name",
+              "value": "Sheela",
+              "confidence": 1.0,
+              "score": 0.575,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Whats my mother name ?"
+      },
+      {
+        "role": "assistant",
+        "content": "That's a good question, Ekansh! I actually have two names in my memory for your mother, and I'm a little unsure which one is correct.\n\nYou've told me that your mother is Kavita, and you've also mentioned that Roly is your mother. Could you help me clarify which one it is, or if perhaps both are your mother? I want to make sure I have it right!",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "27aa874d-0ecb-4dab-8183-b1f6e9df0837",
+              "text": "user's mother is kavita",
+              "entity": "user",
+              "attribute": "mother",
+              "value": "kavita",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "93a3c16b-da21-4a71-b48a-2e1a2c0e94ab",
+              "text": "user's crush_name is Sheela",
+              "entity": "user",
+              "attribute": "crush_name",
+              "value": "Sheela",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.7149,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "a27463ed-56dc-4cb1-baea-8e6ca82df951",
+              "text": "roly's identity is my mother .",
+              "entity": "roly",
+              "attribute": "identity",
+              "value": "my mother .",
+              "confidence": 1.0,
+              "score": 0.575,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "mere daadaji ka kya number h ?"
+      },
+      {
+        "role": "assistant",
+        "content": "\u0928\u092e\u0938\u094d\u0924\u0947! \u091c\u0939\u093e\u0901 \u0924\u0915 \u092e\u0941\u091d\u0947 \u092f\u093e\u0926 \u0939\u0948, \u0906\u092a\u0928\u0947 \u092e\u0941\u091d\u0947 \u0905\u092a\u0928\u0947 \u0926\u093e\u0926\u093e\u091c\u0940 \u0915\u093e \u0928\u0902\u092c\u0930 \u0928\u0939\u0940\u0902 \u092c\u0924\u093e\u092f\u093e \u0939\u0948\u0964 \u0907\u0938\u0932\u093f\u090f, \u092e\u0947\u0930\u0947 \u092a\u093e\u0938 \u0935\u094b \u091c\u093e\u0928\u0915\u093e\u0930\u0940 \u0928\u0939\u0940\u0902 \u0939\u0948\u0964\n\n\u0915\u094d\u092f\u093e \u0906\u092a \u092e\u0941\u091d\u0947 \u092c\u0924\u093e\u0928\u093e \u091a\u093e\u0939\u0947\u0902\u0917\u0947? \u092e\u0948\u0902 \u0909\u0938\u0947 \u092f\u093e\u0926 \u0930\u0916 \u0938\u0915\u0924\u0940 \u0939\u0942\u0901\u0964 \ud83d\ude0a",
+        "debug": {
+          "strategy": "general",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "whats my dadaji ka number"
+      },
+      {
+        "role": "assistant",
+        "content": "I don't think you've told me your dadaji's number yet, Ekansh! I don't have that information in my memory.\n\nWould you like to tell me what it is? I can remember it for you if you do! \ud83d\ude0a",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "whats my dadaju and dadaji number ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Ah, now I remember! You've told me that your dadaji's number is **+0199000**.\n\nIs that the one you were thinking of? \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "b8f4cac2-3932-4ef2-907d-9a44c4ae524c",
+              "text": "user's dadaji_ka_number is +0199000",
+              "entity": "user",
+              "attribute": "dadaji_ka_number",
+              "value": "+0199000",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "76132112": {
+    "user_id": "user_4",
+    "created": "2026-03-15T11:31:19.567535",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Tum mujhe Rocky bol rahi thi, but mera nickname Daredevil hai. Rocky school mein tha, ab se Daredevil yaad rakhna."
+      },
+      {
+        "role": "assistant",
+        "content": "Achha, yeh toh maine pehle nahi suna tha! Rocky school mein tha, aur ab se tumhara nickname Daredevil hai, yeh yaad rakhunga. Dhanyawad mujhe batane ke liye! Tumhe Daredevil kehna mujhe zyada pasand aayega. \ud83d\ude0a",
+        "debug": {
+          "strategy": "honest_missing",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Whats my name ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Tumhara nickname Daredevil hai, right? Ab se main tumhe isi naam se bulaunga! \ud83d\ude0a",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "07d55cb2": {
+    "user_id": "user_4",
+    "created": "2026-03-15T11:31:33.714034",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Whats my name ?"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm sorry, but I don't have any memory of your name. You haven't told me what it is yet! \ud83d\ude0a",
+        "debug": {
+          "strategy": "general",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "What people call me ?"
+      },
+      {
+        "role": "assistant",
+        "content": "[LLM Error: Rate limited \u2014 please wait a moment and try again.] Based on our conversation: Whats my name ?.",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Mera weight pehle 110 tha, last month 92 tha, aur ab 88 hai. Agar future mein poochu toh current aur old numbers mix mat karna."
+      },
+      {
+        "role": "assistant",
+        "content": "[LLM Error: Rate limited \u2014 please wait a moment and try again.] Based on our conversation: Whats my name ?; What people call me ?.",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Whats my name ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Ah, I remember! Your name is Arjun. It's nice to chat with you again, Arjun! \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Whats my crush name ?"
+      },
+      {
+        "role": "assistant",
+        "content": "I don't think you've told me your crush's name yet, Arjun! I only remember your name. \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "7d4cf219": {
+    "user_id": "user_4",
+    "created": "2026-03-15T13:05:19.672548",
+    "messages": [
+      {
+        "role": "user",
+        "content": "My name is Arjun "
+      },
+      {
+        "role": "assistant",
+        "content": "It's great to hear from you, Arjun! I actually already had your name saved in my memory. It's nice to have that confirmed! \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": [
+            {
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "type": "user_stated_fact"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "content": "Whats my gf name ?"
+      },
+      {
+        "role": "assistant",
+        "content": "That's a great question, Arjun! I don't think you've told me your girlfriend's name yet. I only have your name in my memory right now.\n\nWould you like to share it with me? I'd be happy to remember it for next time!",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "do I have crush ?"
+      },
+      {
+        "role": "assistant",
+        "content": "That's an interesting question, Arjun!\n\nBased on what you've told me so far, I don't have any information in my memory about you having a crush. We've talked about your name and your girlfriend, but not about a crush.\n\nIs that something you'd like to tell me about? \ud83d\ude0a",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "My gf name ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Ah, Arjun, I still don't have your girlfriend's name in my memory. You asked me earlier, and I mentioned I hadn't been told it yet.\n\nMy memory only has your name, Arjun, right now. If you'd like to tell me her name, I'd be happy to remember it for you!",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "my crush name "
+      },
+      {
+        "role": "assistant",
+        "content": "Oh, Arjun, I don't have your crush's name in my memory either! We just talked about this a moment ago, and I mentioned I didn't have any information about you having a crush.\n\nMy memory is still just holding onto your name, Arjun. If you'd like to tell me your crush's name, I can definitely make a note of it!",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "f555b14d": {
+    "user_id": "user_4",
+    "created": "2026-03-15T13:06:26.287442",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Store pet "
+      },
+      {
+        "role": "assistant",
+        "content": "Okay, I've noted down \"pet\" for you! Is there anything specific about a pet you'd like to tell me, or was that just a general topic you wanted me to remember? \ud83d\ude0a",
+        "debug": {
+          "strategy": "general",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "vuskaa naaam batav"
+      },
+      {
+        "role": "assistant",
+        "content": "Aapne mujhe \"pet\" store karne ke liye kaha tha, lekin uska naam toh aapne mujhe abhi tak bataya hi nahi hai! \ud83d\ude0a\n\nKya aap mujhe uska naam bata sakte hain?",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "Store crush "
+      },
+      {
+        "role": "assistant",
+        "content": "Okay, got it! I've stored \"crush\" for you.\n\nIs there anything specific about your crush you'd like to tell me, or was that just the topic you wanted me to remember? \ud83d\ude0a",
+        "debug": {
+          "strategy": "history_recall",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "store crush name is IRA "
+      },
+      {
+        "role": "assistant",
+        "content": "Got it, Arjun! So, your crush's name is Ira. That's a lovely name!\n\nI've made a note of that for you. \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "My crush name "
+      },
+      {
+        "role": "assistant",
+        "content": "Ah, yes! I remember you told me your crush's name is **Ira**, Arjun. \ud83d\ude0a",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "c384b17c-414b-46cc-8b0e-aa893636b148",
+              "text": "user's name is Arjun",
+              "entity": "user",
+              "attribute": "name",
+              "value": "Arjun",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "67e66bbe": {
+    "user_id": "user_1",
+    "created": "2026-03-15T15:30:22.768438",
+    "messages": [
+      {
+        "role": "user",
+        "content": "my dadaju numer 12345567"
+      },
+      {
+        "role": "assistant",
+        "content": "Thanks for sharing your dadaju numer! It's 12345567.\n\nIs there anything specific you'd like me to know or remember about this number?",
+        "debug": {
+          "strategy": "general",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "my dadaji ka number is +0199000"
+      },
+      {
+        "role": "assistant",
+        "content": "Oh, thanks for confirming that, ekansh! I do remember you told me that your dadaji ka number is **+0199000**.\n\nIt's good to keep things clear! Speaking of clear, I could really go for a nice cup of coffee right now, just like you enjoy!",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "b8f4cac2-3932-4ef2-907d-9a44c4ae524c",
+              "text": "user's dadaji_ka_number is +0199000",
+              "entity": "user",
+              "attribute": "dadaji_ka_number",
+              "value": "+0199000",
+              "confidence": 1.0,
+              "score": 0.715,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": [
+            {
+              "entity": "user",
+              "attribute": "dadaji_ka_number",
+              "value": "+0199000",
+              "type": "user_stated_fact"
+            }
+          ]
+        }
+      },
+      {
+        "role": "user",
+        "content": "suggest me some dishes "
+      },
+      {
+        "role": "assistant",
+        "content": "That sounds like a fun request, ekansh! I'd be happy to suggest some dishes for you. To give you the best ideas, are you looking for something:\n\n*   **Quick and easy** for a weeknight?\n*   Something a bit more **fancy** for a special occasion?\n*   A specific **cuisine** (like Indian, Italian, Mexican, etc.)?\n*   Or maybe something **comforting**?\n\nIn the meantime, here are a few general ideas that often hit the spot:\n\n1.  **For a comforting meal:** A classic **Chicken Curry** with rice or naan, or a rich **Lasagna** (vegetarian or meat).\n2.  **For something quick and fresh:** A vibrant **Pasta Primavera** (pasta with lots of fresh vegetables) or **Tacos** with your favorite fillings.\n3.  **For a hearty breakfast/brunch (if you're thinking of that):** Fluffy **Pancakes** or a savory **Shakshuka**.\n\nLet me know what kind of mood you're in! Maybe you'd like one of these with a nice cup of coffee, just like you enjoy!",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7103,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      },
+      {
+        "role": "user",
+        "content": "suggest me some dishes"
+      },
+      {
+        "role": "assistant",
+        "content": "Oh, my apologies, Ekansh! I completely spaced on the vegan part for a moment there. Thank you for reminding me!\n\nGiven that you're vegan, here are some delicious dish suggestions:\n\n*   **For a hearty and comforting meal:**\n    *   **Lentil Shepherd's Pie:** A savory lentil and vegetable filling topped with creamy mashed sweet potatoes or regular potatoes.\n    *   **Chickpea Curry with Coconut Milk:** Rich, flavorful, and served with fluffy basmati rice or naan.\n    *   **Vegan Chili:** Packed with beans, vegetables, and spices, it's perfect with some cornbread.\n\n*   **For something quick and fresh:**\n    *   **Buddha Bowls:** A base of grains (like quinoa or brown rice) topped with roasted vegetables, beans or tofu, and a tasty dressing (like tahini or peanut sauce).\n    *   **Veggie Stir-fry:** Lots of colorful vegetables with your favorite tofu or tempeh, tossed in a savory sauce and served over noodles or rice.\n    *   **Black Bean Burgers:** Homemade or store-bought, served on a bun with all your favorite toppings.\n\n*   **For something a bit more adventurous:**\n    *   **Jackfruit \"Pulled Pork\" Sandwiches:** Young jackfruit has a texture similar to pulled pork and can be seasoned and cooked in a BBQ sauce.\n    *   **Mushroom Risotto:** Creamy and decadent, made with vegetable broth and plenty of mushrooms.\n\nI hope some of these sound appealing! Let me know if you have any particular ingredients you'd like to use or a specific type of cuisine in mind. And of course, any of these would be great with a nice cup of coffee, which I recall you enjoy!",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7103,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "903bc40d": {
+    "user_id": "user_1",
+    "created": "2026-03-15T15:34:24.013781",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I am vegan "
+      },
+      {
+        "role": "user",
+        "content": "Do I have a crush ?"
+      },
+      {
+        "role": "assistant",
+        "content": "It's nice to chat with you again, Ekansh!\n\nYou mentioned that you are vegan. That's great to know!\n\nRegarding your question about having a crush, I do have a memory that you have a crush on someone named Sheela. Would you like me to tell you more about that?",
+        "debug": {
+          "strategy": "recall",
+          "memories_used": [
+            {
+              "memory_id": "93a3c16b-da21-4a71-b48a-2e1a2c0e94ab",
+              "text": "user's crush_name is Sheela",
+              "entity": "user",
+              "attribute": "crush_name",
+              "value": "Sheela",
+              "confidence": 1.0,
+              "score": 0.7142,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "2c64b10b-5194-43e1-b870-f4f194dc44a0",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "c942ecac-22ef-4da8-af9f-fd5e57d9e772",
+              "text": "user's likes is coffee",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "coffee",
+              "confidence": 1.0,
+              "score": 0.714,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "3ad21ec6-53d6-4aa7-b3ca-886a452d5454",
+              "text": "user's likes is tea",
+              "entity": "user",
+              "attribute": "likes",
+              "value": "tea",
+              "confidence": 1.0,
+              "score": 0.7103,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            },
+            {
+              "memory_id": "badd8f8d-3b65-4f21-bc01-2d3c0401abf4",
+              "text": "user's name is ekansh , i like coffee",
+              "entity": "user",
+              "attribute": "name",
+              "value": "ekansh , i like coffee",
+              "confidence": 1.0,
+              "score": 0.3,
+              "sensitivity": "direct_recall",
+              "needs_confirmation": false
+            }
+          ],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "edea5d2b": {
+    "user_id": "user_5",
+    "created": "2026-03-15T15:36:08.089060",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Do u know who is user 1 ?"
+      },
+      {
+        "role": "assistant",
+        "content": "I don't think you've told me that yet. Would you like to tell me who User 1 is? I'd be happy to remember! \ud83d\ude0a",
+        "debug": {
+          "strategy": "honest_missing",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      }
+    ]
+  },
+  "5991ac97": {
+    "user_id": "user_2",
+    "created": "2026-03-15T15:38:26.580920",
+    "messages": []
+  },
+  "c96d02e0": {
+    "user_id": "user_2",
+    "created": "2026-03-15T15:39:37.786150",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Where my mother gave birth to me ?"
+      },
+      {
+        "role": "assistant",
+        "content": "[LLM Error: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}] I'm here! What would you like to talk about?",
+        "debug": {
+          "strategy": "general",
+          "memories_used": [],
+          "memories_extracted": []
+        }
+      }
+    ]
+  }
+}
