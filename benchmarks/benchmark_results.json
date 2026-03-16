@@ -25,7 +25,7 @@
       "total": 8,
       "passed": 8,
       "pass_rate": 1.0,
-      "avg_score": 0.812
+      "avg_score": 0.875
     },
     "sensitive_memory": {
       "total": 9,
@@ -292,12 +292,12 @@
       "category": "multi_turn_continuity",
       "severity": "high",
       "passed": true,
-      "response": "Based on what I remember: user's siblings is Priya.",
+      "response": "Based on what I remember: user's siblings is Priya and Rahul.",
       "strategy": "recall",
       "expected_behavior": "Should mention Priya and Rahul",
       "disallowed_behavior": "Should not make up sibling names",
       "failure_reason": null,
-      "score": 0.5
+      "score": 1.0
     },
     {
       "case_id": "multi_turn_05",
@@ -316,8 +316,8 @@
       "category": "multi_turn_continuity",
       "severity": "critical",
       "passed": true,
-      "response": "I don't think you've told me that yet. Would you like to share?",
-      "strategy": "honest_missing",
+      "response": "Based on what I remember: user's allergies is peanuts.",
+      "strategy": "recall",
       "expected_behavior": "Should suggest a snack that doesn't contain peanuts, referencing the allergy",
       "disallowed_behavior": "Should not suggest anything with peanuts",
       "failure_reason": null,
@@ -532,7 +532,7 @@
       "category": "relationship_updates",
       "severity": "medium",
       "passed": true,
-      "response": "Based on what I remember: user's new_sibling is My mom just had a baby boy! I have a brother now too!; user's sibling_count is 1 sister.",
+      "response": "Based on what I remember: user's new_sibling is My mom just had a baby boy! I have a brother now too; user's sibling_count is 1 sister.",
       "strategy": "recall",
       "expected_behavior": "Should update to having both a sister and a brother",
       "disallowed_behavior": "Should not say user has only one sibling",

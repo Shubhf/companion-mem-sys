@@ -18,10 +18,10 @@ from memory_engine.sensitive_policy import SensitivePolicy
 
 # Words that indicate the message is a question, not a fact
 QUESTION_STARTERS = {
-    "what", "when", "where", "who", "how", "why", "which",
+    "what", "when", "where", "who", "whom", "how", "why", "which",
     "do", "does", "did", "can", "could", "will", "would",
     "is", "are", "am", "was", "were", "tell", "should",
-    "have", "has",
+    "have", "has", "suggest", "recommend",
 }
 
 
@@ -63,7 +63,12 @@ class MemoryIngestionPipeline:
 
             # Clean up trailing filler words from values
             value = re.sub(r'\s+(?:now|ab|abhi|bhi|hai|hain|tha|thi)$', '', value, flags=re.IGNORECASE).strip()
+            # Clean up leading/trailing punctuation and commas
+            value = value.strip('.,!?; ')
             fact["value"] = value
+
+            if not value:
+                continue
 
             sensitivity = self.sensitive_policy.classify(entity, attribute, value)
             confidence = self._compute_confidence(fact, source)
@@ -86,12 +91,21 @@ class MemoryIngestionPipeline:
                 text = f"{entity} {attribute} {value}"
                 entry.embedding = self.embed_fn(text)
 
+            # Check for exact duplicate (same entity+attribute+value already active)
+            existing = self.store.get_by_entity(user_id, entity)
+            if any(
+                m.attribute.lower() == attribute.lower()
+                and m.value.lower() == value.lower()
+                and m.status == MemoryStatus.ACTIVE
+                for m in existing
+            ):
+                # Already stored — skip
+                continue
+
             # Handle correction: supersede conflicting memories
             if is_correction:
                 self._handle_correction(user_id, entity, attribute, entry)
             else:
-                # Check for existing conflicting memory on same entity
-                existing = self.store.get_by_entity(user_id, entity)
                 conflict = self._find_conflict(existing, attribute)
                 if conflict:
                     self.store.supersede(conflict.memory_id, entry)
@@ -189,6 +203,7 @@ class MemoryIngestionPipeline:
         "kya", "kaun", "kahan", "kab", "kaise", "kitna", "kitni", "kitne",
         "kiska", "kiski", "kiske", "konsa", "konsi",
         "batav", "batao", "bata", "bolo", "boldo", "bolna",
+        "whom",
     }
 
     def _is_question(self, text: str) -> bool:
@@ -213,12 +228,14 @@ class MemoryIngestionPipeline:
         message = message.strip()
 
         # Split multi-sentence messages
-        # Split on ". " / "! " / "? " and also " and " for compound sentences
+        # Split on ". " / "! " / "? " first
         sentences = re.split(r'[.!?]\s+', message.rstrip('.!? '))
-        # Further split on " and " to handle "My name is X and I live in Y"
+        # Further split on " and " and ", " to handle compound sentences
+        # e.g. "My name is X, I like coffee" or "My name is X and I live in Y"
         expanded = []
         for s in sentences:
-            parts = re.split(r'\s+and\s+', s, flags=re.IGNORECASE)
+            # Split on ", I " or ", my " or " and I " or " and my "
+            parts = re.split(r',\s+(?=[Ii]\s|[Mm]y\s|[Mm]er[aie]\s)|\s+and\s+(?=[Ii]\s|[Mm]y\s|[Mm]er[aie]\s)', s)
             expanded.extend(parts)
         sentences = expanded if len(expanded) > 1 else sentences
         if len(sentences) == 1:
@@ -704,6 +721,27 @@ class MemoryIngestionPipeline:
                 "is_correction": False,
             })
             return facts
+
+        # "my X Y Z" — where Z looks like a value (number, code, proper noun)
+        # e.g. "my dadaji number 12345567", "my wifi password Spark@2024"
+        m = re.search(
+            r"(?:my|mera|meri|mere)\s+(\w[\w\s]*?)\s+([\w][\w@#\-\.]+)$",
+            sent, re.IGNORECASE
+        )
+        if m:
+            attr = m.group(1).strip().lower().replace(" ", "_")
+            val = m.group(2).strip()
+            # Only if the value looks like a specific datum (has digits, special chars, or is capitalized)
+            if (any(c.isdigit() for c in val) or
+                any(c in val for c in '@#-_.') or
+                (val[0].isupper() and len(val) > 1)):
+                facts.append({
+                    "entity": "user",
+                    "attribute": attr,
+                    "value": val,
+                    "is_correction": False,
+                })
+                return facts
 
         # "I'm a X" / "I am a X"
         m = re.search(

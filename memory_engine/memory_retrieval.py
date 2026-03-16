@@ -112,7 +112,10 @@ QUERY_ATTRIBUTE_MAP = {
     "dost": ["friend", "best_friend", "friend_name"],
     "behen": ["sister", "sister_name", "sibling"],
     "bhai": ["brother", "brother_name", "sibling"],
-    "dadaji": ["grandfather", "dadaji", "service_number", "dadaji_service_number"],
+    "dadaji": ["grandfather", "dadaji", "service_number", "dadaji_service_number", "dadaji_ka_number"],
+    "daadaji": ["grandfather", "dadaji", "service_number", "dadaji_service_number", "dadaji_ka_number"],
+    "dadadji": ["grandfather", "dadaji", "service_number", "dadaji_service_number", "dadaji_ka_number"],
+    "dadaju": ["grandfather", "dadaji", "service_number", "dadaji_service_number", "dadaji_ka_number"],
     "boss": ["boss", "manager", "boss_name"],
     "service": ["service_number", "dadaji_service_number"],
     "number": ["service_number", "phone", "phone_number", "dadaji_service_number"],
@@ -132,8 +135,15 @@ QUERY_ATTRIBUTE_MAP = {
     "breakfast": ["likes", "preference", "food", "morning_drink", "diet"],
     "prefer": ["likes", "preference"],
     "favorite": ["likes", "preference", "favorite_color", "favorite_food", "favorite_movie"],
-    "suggest": ["likes", "preference", "hobby", "hobbies"],
-    "recommend": ["likes", "preference", "hobby", "hobbies"],
+    "suggest": ["likes", "preference", "hobby", "hobbies", "diet", "food", "identity"],
+    "recommend": ["likes", "preference", "hobby", "hobbies", "diet", "food", "identity"],
+    "dishes": ["diet", "food", "favorite_food", "likes", "identity", "preference"],
+    "dish": ["diet", "food", "favorite_food", "likes", "identity", "preference"],
+    "order": ["likes", "preference", "diet", "food", "morning_drink"],
+    "vegan": ["diet", "identity", "food"],
+    "vegetarian": ["diet", "identity", "food"],
+    "morning": ["morning_drink", "likes", "preference"],
+    "humid": ["likes", "preference", "morning_drink"],
 }
 
 
@@ -255,7 +265,8 @@ class MemoryRetriever:
                       "batav", "bata", "batao", "bolo", "boldo",
                       "vuskaa", "uska", "uski", "iska", "iski",
                       # These indicate queries about user's stored data
-                      "dadaji", "dada", "papa", "mummy", "nana", "nani"}
+                      "dadaji", "daadaji", "dadaju", "dada", "papa", "mummy",
+                      "nana", "nani", "mere", "suggest", "recommend"}
         words = set(w.lower().rstrip("'s") for w in text.split())
         return bool(words & self_words)
 
