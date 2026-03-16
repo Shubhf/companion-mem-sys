@@ -167,27 +167,89 @@ class ConversationManager:
 
         return self._fallback_response(plan)
 
+    def _format_memory_naturally(self, memories: list[dict], user_name: str = None) -> str:
+        """Format memory facts into natural language instead of raw key=value."""
+        name = user_name
+        facts_by_attr = {}
+
+        for m in memories:
+            attr = m.get("attribute", "")
+            value = m.get("value", "")
+            entity = m.get("entity", "user")
+            if attr == "name" and entity == "user":
+                name = value
+                continue
+            # For non-user entities, prefix the value with entity name
+            if entity != "user":
+                key = f"{entity}_{attr}"
+            else:
+                key = attr
+            facts_by_attr.setdefault(key, []).append({"value": value, "entity": entity})
+
+        parts = []
+        for attr_key, val_list in facts_by_attr.items():
+            # Deduplicate by value
+            seen = set()
+            unique = []
+            for v in val_list:
+                if v["value"].lower() not in seen:
+                    seen.add(v["value"].lower())
+                    unique.append(v)
+
+            values = [v["value"] for v in unique]
+            entity = unique[0]["entity"] if unique else "user"
+
+            # Determine the base attribute (strip entity prefix for non-user)
+            attr = attr_key.split("_", 1)[-1] if entity != "user" else attr_key
+            readable = attr_key.replace("_", " ")
+            entity_cap = entity.capitalize() if entity != "user" else ""
+
+            if attr_key == "likes":
+                parts.append(f"you like {', '.join(values)}")
+            elif attr_key == "identity":
+                parts.append(f"you're {', '.join(values)}")
+            elif attr_key in ("city", "location"):
+                parts.append(f"you live in {values[0]}")
+            elif attr_key in ("crush_name", "crush"):
+                parts.append(f"your crush is {values[0]}")
+            elif attr_key in ("job", "work"):
+                parts.append(f"you work as {values[0]}")
+            elif entity != "user":
+                # Non-user entity: "Spark's species is hamster"
+                parts.append(f"{entity_cap}'s {attr.replace('_', ' ')} is {values[0]}")
+            elif "_name" in attr_key:
+                label = attr_key.replace("_name", "").replace("_", " ")
+                parts.append(f"your {label}'s name is {values[0]}")
+            elif attr_key in ("hobby", "hobbies"):
+                parts.append(f"your hobbies are {', '.join(values)}")
+            elif "number" in attr_key or "password" in attr_key:
+                parts.append(f"your {readable} is {values[0]}")
+            else:
+                parts.append(f"your {readable} is {', '.join(values)}")
+
+        if not parts:
+            return None
+
+        greeting = f"Hey {name}! " if name else ""
+        if len(parts) == 1:
+            return f"{greeting}From what I remember, {parts[0]}."
+        else:
+            body = ", ".join(parts[:-1]) + f", and {parts[-1]}"
+            return f"{greeting}From what I remember, {body}."
+
     def _fallback_response(self, plan) -> str:
         """Rule-based fallback when no LLM is available."""
         if plan.strategy == "recall" and plan.memory_context:
-            # Extract user name for personalization
-            name = None
-            other_facts = []
-            for m in plan.memory_context:
-                if m.get("attribute") == "name":
-                    name = m["value"]
-                else:
-                    other_facts.append(m["text"])
-
-            if not other_facts:
-                other_facts = [m["text"] for m in plan.memory_context]
-
-            prefix = f"{name}, based" if name else "Based"
-            return f"{prefix} on what I remember: " + "; ".join(other_facts) + "."
+            natural = self._format_memory_naturally(plan.memory_context)
+            if natural:
+                return natural
+            # Shouldn't happen, but just in case
+            facts = [m["text"] for m in plan.memory_context]
+            return "Based on what I remember: " + "; ".join(facts) + "."
 
         if plan.strategy == "history_recall" and plan.history_context:
             hist_texts = [h["text"] for h in plan.history_context[:5]]
-            return "Based on our conversation: " + "; ".join(hist_texts) + "."
+            return "From our conversation, you mentioned: " + "; ".join(hist_texts) + "."
 
         if plan.strategy == "honest_missing":
             return (
