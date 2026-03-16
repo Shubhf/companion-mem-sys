@@ -193,9 +193,40 @@ def init_session():
             st.session_state.active_chat_id = create_new_chat(st.session_state.current_user)
 
 
-def _build_llm_fn():
-    """Build Gemini LLM function."""
+def _build_ollama_fn():
+    """Build Ollama LLM function as local fallback."""
     try:
+        import ollama as ollama_lib
+        # Test connection
+        ollama_lib.chat(model="llama3.2", messages=[{"role": "user", "content": "hi"}])
+        st.session_state._ollama_model = "llama3.2"
+        return True
+    except Exception:
+        pass
+    try:
+        import ollama as ollama_lib
+        models = ollama_lib.list()
+        if models and models.get("models"):
+            model_name = models["models"][0]["name"]
+            st.session_state._ollama_model = model_name
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def _call_ollama(messages: list[dict]) -> str:
+    """Call Ollama for generation."""
+    import ollama as ollama_lib
+    model = st.session_state.get("_ollama_model", "llama3.2")
+    resp = ollama_lib.chat(model=model, messages=messages)
+    return resp["message"]["content"].strip()
+
+
+def _build_gemini_caller():
+    """Build Gemini API caller. Returns (caller_fn, api_key_found)."""
+    try:
+        # Load .env locally
         env_path = PROJECT_ROOT / ".env"
         if env_path.exists():
             for line in env_path.read_text().splitlines():
@@ -207,9 +238,14 @@ def _build_llm_fn():
         from google import genai
         from google.genai import types
 
-        api_key = os.environ.get("GEMINI_API_KEY")
+        # Try st.secrets first (Streamlit Cloud), then env var
+        api_key = None
+        try:
+            api_key = st.secrets["GEMINI_API_KEY"]
+        except Exception:
+            api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
-            raise ValueError("GEMINI_API_KEY not found")
+            return None, False
 
         client = genai.Client(api_key=api_key)
         MODEL_CHAIN = [
@@ -217,7 +253,7 @@ def _build_llm_fn():
             "gemini-2.0-flash", "gemini-2.0-flash-lite",
         ]
 
-        def llm_fn(messages: list[dict]) -> str:
+        def call_gemini(messages: list[dict]) -> str:
             system_prompt = ""
             contents = []
             for msg in messages:
@@ -241,29 +277,76 @@ def _build_llm_fn():
                         resp = client.models.generate_content(
                             model=model, contents=contents, config=config,
                         )
-                        return resp.text.strip() if resp.text else "[Empty response]"
+                        return resp.text.strip() if resp.text else None
                     except Exception as e:
-                        if "429" in str(e) or "quota" in str(e).lower():
+                        err = str(e)
+                        if "429" in err or "quota" in err.lower() or "403" in err:
                             if attempt == 0:
-                                time.sleep(3)
+                                time.sleep(2)
                                 continue
                             break
-                        elif "404" in str(e):
+                        elif "404" in err:
                             break
                         else:
                             raise
-            raise RuntimeError("Rate limited — please wait a moment and try again.")
+            return None  # All models rate-limited
 
-        # Health check
-        llm_fn([{"role": "user", "content": "Say ok"}])
-        st.session_state.llm_status = "Gemini 2.5 Flash"
-        st.session_state.llm_ok = True
-        return llm_fn
+        return call_gemini, True
+    except Exception:
+        return None, False
 
-    except Exception as e:
-        st.session_state.llm_status = str(e)[:60]
+
+def _build_llm_fn():
+    """
+    Build LLM function with fallback chain:
+    Gemini API → Ollama (local) → None (rule-based fallback in ConversationManager)
+    """
+    gemini_fn, has_gemini = _build_gemini_caller()
+    has_ollama = _build_ollama_fn()
+
+    if not has_gemini and not has_ollama:
+        st.session_state.llm_status = "No LLM (add GEMINI_API_KEY or run Ollama)"
         st.session_state.llm_ok = False
         return None
+
+    # Status label
+    parts = []
+    if has_gemini:
+        parts.append("Gemini")
+    if has_ollama:
+        parts.append(f"Ollama ({st.session_state.get('_ollama_model', '?')})")
+    st.session_state.llm_status = " + ".join(parts)
+    st.session_state.llm_ok = True
+
+    def llm_fn(messages: list[dict]) -> str:
+        # Try Gemini first
+        if gemini_fn:
+            try:
+                result = gemini_fn(messages)
+                if result:
+                    return result
+            except Exception:
+                pass  # Fall through to Ollama
+
+        # Try Ollama as fallback
+        if has_ollama:
+            try:
+                return _call_ollama(messages)
+            except Exception:
+                pass  # Fall through to None
+
+        # Both failed — return None so ConversationManager uses rule-based fallback
+        return None
+
+    # Health check (non-blocking — don't fail init if rate-limited)
+    try:
+        test = llm_fn([{"role": "user", "content": "Say ok"}])
+        if not test:
+            st.session_state.llm_status += " (warming up)"
+    except Exception:
+        st.session_state.llm_status += " (warming up)"
+
+    return llm_fn
 
 
 def _get_user_chats(user_id: str) -> list[tuple[str, dict]]:

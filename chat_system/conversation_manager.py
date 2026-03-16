@@ -161,9 +161,12 @@ class ConversationManager:
             messages.append({"role": "user", "content": plan.user_message})
 
             try:
-                return self.llm_fn(messages)
-            except Exception as e:
-                return f"[LLM Error: {e}] " + self._fallback_response(plan)
+                result = self.llm_fn(messages)
+                if result:  # LLM returned a response
+                    return result
+                # LLM returned None (rate-limited) — use fallback
+            except Exception:
+                pass  # Use fallback
 
         return self._fallback_response(plan)
 
