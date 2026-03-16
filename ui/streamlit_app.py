@@ -125,8 +125,44 @@ st.markdown("""
 CHATS_FILE = str(PROJECT_ROOT / "chat_sessions.json")
 
 
+def _init_chats_table():
+    """Create chat sessions table in the memory store DB."""
+    if "store" in st.session_state:
+        try:
+            st.session_state.store.conn.execute("""
+                CREATE TABLE IF NOT EXISTS chat_sessions (
+                    chat_id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    created TEXT NOT NULL,
+                    messages TEXT NOT NULL DEFAULT '[]'
+                )
+            """)
+            st.session_state.store.conn.commit()
+        except Exception:
+            pass
+
+
 def load_all_chats() -> dict:
-    """Load all chat sessions from disk."""
+    """Load chat sessions from database, fallback to JSON file."""
+    # Try database first
+    if "store" in st.session_state:
+        try:
+            _init_chats_table()
+            rows = st.session_state.store.conn.execute(
+                "SELECT chat_id, user_id, created, messages FROM chat_sessions"
+            ).fetchall()
+            chats = {}
+            for row in rows:
+                chats[row[0]] = {
+                    "user_id": row[1],
+                    "created": row[2],
+                    "messages": json.loads(row[3]),
+                }
+            return chats
+        except Exception:
+            pass
+
+    # Fallback to JSON file
     if os.path.exists(CHATS_FILE):
         try:
             with open(CHATS_FILE, "r") as f:
@@ -137,9 +173,38 @@ def load_all_chats() -> dict:
 
 
 def save_all_chats(chats: dict):
-    """Persist all chat sessions to disk."""
-    with open(CHATS_FILE, "w") as f:
-        json.dump(chats, f, indent=2, default=str)
+    """Persist chat sessions to database and JSON file."""
+    # Save to database
+    if "store" in st.session_state:
+        try:
+            _init_chats_table()
+            for cid, data in chats.items():
+                st.session_state.store.conn.execute(
+                    "INSERT OR REPLACE INTO chat_sessions (chat_id, user_id, created, messages) "
+                    "VALUES (?, ?, ?, ?)",
+                    (cid, data["user_id"], data["created"],
+                     json.dumps(data["messages"], default=str))
+                )
+            # Clean up deleted chats
+            existing_ids = set(chats.keys())
+            db_rows = st.session_state.store.conn.execute(
+                "SELECT chat_id FROM chat_sessions"
+            ).fetchall()
+            for row in db_rows:
+                if row[0] not in existing_ids:
+                    st.session_state.store.conn.execute(
+                        "DELETE FROM chat_sessions WHERE chat_id = ?", (row[0],)
+                    )
+            st.session_state.store.conn.commit()
+        except Exception:
+            pass
+
+    # Also save to JSON as backup
+    try:
+        with open(CHATS_FILE, "w") as f:
+            json.dump(chats, f, indent=2, default=str)
+    except Exception:
+        pass
 
 
 def get_chat_title(messages: list) -> str:
@@ -169,7 +234,18 @@ def create_new_chat(user_id: str) -> str:
 def init_session():
     if "store" not in st.session_state:
         db_path = str(PROJECT_ROOT / "memories_ui.db")
-        st.session_state.store = MemoryStore(db_path=db_path)
+        # Try Turso cloud DB first (from st.secrets or env), fallback to local SQLite
+        turso_url = None
+        turso_token = None
+        try:
+            turso_url = st.secrets.get("TURSO_DATABASE_URL")
+            turso_token = st.secrets.get("TURSO_AUTH_TOKEN")
+        except Exception:
+            pass
+        st.session_state.store = MemoryStore(
+            db_path=db_path, turso_url=turso_url, turso_token=turso_token
+        )
+        st.session_state.db_type = st.session_state.store.db_type
 
     if "manager" not in st.session_state:
         llm_fn = _build_llm_fn()
@@ -471,7 +547,8 @@ with st.sidebar:
     st.markdown(f"{'🟢' if llm_ok else '🔴'} **{st.session_state.get('llm_status', 'No LLM')}**")
 
     mem_count = st.session_state.store.count(st.session_state.current_user)
-    st.caption(f"Memories: {mem_count} | User: {st.session_state.current_user}")
+    db_label = "Turso Cloud" if st.session_state.get("db_type") == "turso" else "Local SQLite"
+    st.caption(f"Memories: {mem_count} | DB: {db_label} | User: {st.session_state.current_user}")
 
     st.markdown("---")
 

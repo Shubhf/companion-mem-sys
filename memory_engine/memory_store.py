@@ -1,12 +1,14 @@
 """
-Memory Store — SQLite-backed persistence with FAISS vector index.
+Memory Store — SQLite/Turso-backed persistence with FAISS vector index.
 
 Handles CRUD operations for memory entries with full user isolation.
+Supports both local SQLite and cloud Turso (libSQL) for persistent storage.
 The FAISS index is rebuilt on startup from stored embeddings.
 """
 
 import sqlite3
 import json
+import os
 import numpy as np
 from datetime import datetime
 from typing import Optional
@@ -25,13 +27,40 @@ from memory_engine.memory_schema import (
 EMBEDDING_DIM = 384  # Default for all-MiniLM-L6-v2
 
 
-class MemoryStore:
-    """SQLite + FAISS memory store with per-user isolation."""
+def _connect_db(db_path: str, turso_url: str = None, turso_token: str = None):
+    """
+    Connect to database. Tries Turso first if credentials are available,
+    falls back to local SQLite.
+    """
+    # Check for Turso credentials
+    url = turso_url or os.environ.get("TURSO_DATABASE_URL")
+    token = turso_token or os.environ.get("TURSO_AUTH_TOKEN")
 
-    def __init__(self, db_path: str = "memories.db"):
+    if url and token:
+        try:
+            import libsql_experimental as libsql
+            conn = libsql.connect(
+                database=url,
+                auth_token=token,
+            )
+            conn.row_factory = sqlite3.Row
+            return conn, "turso"
+        except Exception as e:
+            print(f"Turso connection failed ({e}), falling back to local SQLite")
+
+    # Local SQLite fallback
+    conn = sqlite3.connect(db_path, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    return conn, "sqlite"
+
+
+class MemoryStore:
+    """SQLite/Turso + FAISS memory store with per-user isolation."""
+
+    def __init__(self, db_path: str = "memories.db",
+                 turso_url: str = None, turso_token: str = None):
         self.db_path = db_path
-        self.conn = sqlite3.connect(db_path, check_same_thread=False)
-        self.conn.row_factory = sqlite3.Row
+        self.conn, self.db_type = _connect_db(db_path, turso_url, turso_token)
         self._create_tables()
         self._faiss_indices: dict[str, faiss.IndexFlatIP] = {}
         self._id_maps: dict[str, list[str]] = {}
