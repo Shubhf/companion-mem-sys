@@ -27,28 +27,103 @@ from memory_engine.memory_schema import (
 EMBEDDING_DIM = 384  # Default for all-MiniLM-L6-v2
 
 
+class TursoHTTPConnection:
+    """
+    SQLite-compatible wrapper around Turso's HTTP API.
+    No native library needed — works on any Python version.
+    """
+
+    def __init__(self, url: str, token: str):
+        import httpx
+        # Convert libsql:// to https://
+        self.base_url = url.replace("libsql://", "https://").rstrip("/")
+        self.token = token
+        self.client = httpx.Client(timeout=30)
+        self.row_factory = None
+
+    def execute(self, sql: str, params: tuple = None):
+        """Execute a SQL statement via Turso HTTP API."""
+        body = {"statements": [{"q": sql}]}
+        if params:
+            body["statements"][0]["params"] = [
+                {"type": "text", "value": str(p)} if p is not None else {"type": "null"}
+                for p in params
+            ]
+
+        resp = self.client.post(
+            f"{self.base_url}/v3/pipeline",
+            json=body,
+            headers={"Authorization": f"Bearer {self.token}"},
+        )
+
+        if resp.status_code != 200:
+            raise RuntimeError(f"Turso API error: {resp.status_code} {resp.text[:200]}")
+
+        data = resp.json()
+        results = data.get("results", [])
+        if not results:
+            return _TursoResult([], [])
+
+        result = results[0].get("response", {}).get("result", {})
+        cols = [c["name"] for c in result.get("cols", [])]
+        rows_raw = result.get("rows", [])
+
+        rows = []
+        for row in rows_raw:
+            values = [cell.get("value") for cell in row]
+            if self.row_factory == sqlite3.Row:
+                rows.append(_TursoRow(cols, values))
+            else:
+                rows.append(values)
+
+        return _TursoResult(rows, cols)
+
+    def commit(self):
+        pass  # HTTP API auto-commits
+
+
+class _TursoResult:
+    def __init__(self, rows, cols):
+        self._rows = rows
+        self._cols = cols
+        self.lastrowid = None
+
+    def fetchall(self):
+        return self._rows
+
+    def fetchone(self):
+        return self._rows[0] if self._rows else None
+
+
+class _TursoRow:
+    """Mimics sqlite3.Row for compatibility."""
+    def __init__(self, cols, values):
+        self._data = dict(zip(cols, values))
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return list(self._data.values())[key]
+        return self._data.get(key)
+
+    def keys(self):
+        return self._data.keys()
+
+
 def _connect_db(db_path: str, turso_url: str = None, turso_token: str = None):
-    """
-    Connect to database. Tries Turso first if credentials are available,
-    falls back to local SQLite.
-    """
-    # Check for Turso credentials
+    """Connect to Turso (cloud) or local SQLite."""
     url = turso_url or os.environ.get("TURSO_DATABASE_URL")
     token = turso_token or os.environ.get("TURSO_AUTH_TOKEN")
 
     if url and token:
         try:
-            import libsql_experimental as libsql
-            conn = libsql.connect(
-                database=url,
-                auth_token=token,
-            )
+            conn = TursoHTTPConnection(url, token)
             conn.row_factory = sqlite3.Row
+            # Test connection
+            conn.execute("SELECT 1")
             return conn, "turso"
         except Exception as e:
             print(f"Turso connection failed ({e}), falling back to local SQLite")
 
-    # Local SQLite fallback
     conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn, "sqlite"
