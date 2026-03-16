@@ -3,6 +3,7 @@ Memory Retrieval — ranked memory retrieval with multi-signal scoring.
 
 Combines entity matching, attribute keyword matching, full-text keyword search,
 semantic similarity, recency, and confidence to produce ranked results.
+Includes autocorrect for query typos.
 """
 
 import re
@@ -14,6 +15,13 @@ from memory_engine.memory_schema import (
 )
 from memory_engine.memory_store import MemoryStore
 from memory_engine.sensitive_policy import SensitivePolicy
+
+try:
+    from autocorrect import Speller
+    _speller = Speller(lang='en')
+    AUTOCORRECT_AVAILABLE = True
+except ImportError:
+    AUTOCORRECT_AVAILABLE = False
 
 
 # Scoring weights
@@ -272,10 +280,32 @@ class MemoryRetriever:
         words = set(w.lower().rstrip("'s") for w in text.split())
         return bool(words & self_words)
 
+    # Words that should NOT be autocorrected (Hinglish, names, etc.)
+    _NO_AUTOCORRECT = {
+        "mera", "meri", "mere", "kya", "hai", "hain", "kaun", "kahan",
+        "kab", "kaise", "kitna", "kitni", "batav", "batao", "bata",
+        "bolo", "boldo", "naam", "vuskaa", "uska", "uski", "iska",
+        "dadaji", "daadaji", "dadaju", "dada", "papa", "mummy",
+        "nana", "nani", "rehta", "rehti", "ghar", "khana", "paisa",
+        "gaadi", "shaadi", "padhai", "sehat", "dost", "bhai", "behen",
+        "hoon", "main", "tujhe", "kaam",
+    }
+
+    def _autocorrect_word(self, word: str) -> str:
+        """Autocorrect a word if it's an English typo, skip Hinglish."""
+        if not AUTOCORRECT_AVAILABLE:
+            return word
+        if word in self._NO_AUTOCORRECT:
+            return word
+        if len(word) <= 2:
+            return word
+        # Only correct if the word looks like English (no Hindi words)
+        corrected = _speller(word)
+        return corrected if corrected else word
+
     def _extract_query_keywords(self, text: str) -> list[str]:
-        """Extract meaningful keywords from a query, preserving action verbs."""
+        """Extract meaningful keywords from a query, with autocorrect for typos."""
         words = re.findall(r'\b[A-Za-z]\w+\b', text)
-        # Use a lighter stop list that keeps action verbs present in QUERY_ATTRIBUTE_MAP
         light_stop = {
             "the", "is", "are", "was", "were", "what", "who", "how",
             "does", "do", "did", "can", "will", "my", "your", "his",
@@ -288,7 +318,18 @@ class MemoryRetriever:
             "of", "in", "on", "at", "to", "by", "up", "out",
             "so", "if", "just", "now", "then", "than",
         }
-        return [w.lower() for w in words if w.lower() not in light_stop]
+        keywords = []
+        for w in words:
+            wl = w.lower()
+            if wl in light_stop:
+                continue
+            # Try autocorrect: "professin" → "profession"
+            corrected = self._autocorrect_word(wl)
+            keywords.append(corrected)
+            # Also keep original if different (for Hinglish/names)
+            if corrected != wl:
+                keywords.append(wl)
+        return keywords
 
     def _extract_entities(self, text: str) -> list[str]:
         """Extract potential entity names from query text."""

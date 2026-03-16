@@ -750,15 +750,37 @@ class MemoryIngestionPipeline:
         )
         if m:
             val = m.group(1).strip()
-            # Avoid capturing emotional states or actions as identity
+            # Avoid capturing emotional states or actions
             if not any(w in val.lower() for w in [
                 "here", "feeling", "going", "planning", "looking",
                 "learning", "training", "seeing", "stressed",
                 "allergic", "into",
             ]):
+                # Determine if this is a profession or a trait
+                profession_keywords = {
+                    "engineer", "developer", "designer", "doctor", "nurse",
+                    "teacher", "professor", "student", "researcher", "scientist",
+                    "analyst", "consultant", "manager", "architect", "writer",
+                    "artist", "musician", "chef", "lawyer", "accountant",
+                    "freelancer", "intern", "founder", "ceo", "cto",
+                    "programmer", "data", "software", "devops", "ai", "ml",
+                    "web", "full", "front", "back", "cloud", "product",
+                    "marketing", "sales", "hr", "finance", "mechanic",
+                    "pilot", "journalist", "photographer", "filmmaker",
+                    "pharmacist", "dentist", "surgeon", "therapist",
+                    "entrepreneur", "businessman", "businesswoman",
+                    "tutor", "coach", "trainer", "plumber", "electrician",
+                    "carpenter", "driver", "officer", "soldier",
+                }
+                val_lower = val.lower()
+                is_profession = any(kw in val_lower for kw in profession_keywords)
+
+                # Trait keywords (vegan, vegetarian, etc.) stay as identity
+                attr = "job" if is_profession else "identity"
+
                 facts.append({
                     "entity": "user",
-                    "attribute": "identity",
+                    "attribute": attr,
                     "value": val,
                     "is_correction": False,
                 })
