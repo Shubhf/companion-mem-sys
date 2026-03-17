@@ -240,43 +240,63 @@ class ConversationManager:
             body = ", ".join(parts[:-1]) + f", and {parts[-1]}"
             return f"{greeting}From what I remember, {body}."
 
+    # Varied response templates for natural feel
+    _HONEST_MISSING_TEMPLATES = [
+        "Hmm, I don't think you've told me that yet! Want to share?",
+        "I don't have that in my memory yet. Would you like to tell me?",
+        "That's something I don't know about you yet! Care to fill me in?",
+        "I wish I knew! You haven't mentioned that to me before.",
+        "Hmm, that one's not in my memory. Tell me about it?",
+    ]
+
+    _GREETING_TEMPLATES = [
+        "Hey! Good to see you. What's on your mind today?",
+        "Hi there! How's everything going? What would you like to chat about?",
+        "Hey! I'm here. Kya chal raha hai?",
+        "Hello! Nice to hear from you. What's up?",
+    ]
+
+    _FAREWELL_TEMPLATES = [
+        "Bye! Take care, see you soon!",
+        "Goodbye! It was great chatting. Come back anytime!",
+        "See you later! Take care of yourself.",
+    ]
+
     def _fallback_response(self, plan) -> str:
-        """Rule-based fallback when no LLM is available."""
+        """Rule-based fallback when no LLM is available — warm and varied."""
+        import random
+
         if plan.strategy == "recall" and plan.memory_context:
             natural = self._format_memory_naturally(plan.memory_context)
             if natural:
                 return natural
-            # Shouldn't happen, but just in case
             facts = [m["text"] for m in plan.memory_context]
-            return "Based on what I remember: " + "; ".join(facts) + "."
+            return "From what I remember: " + "; ".join(facts) + "."
 
         if plan.strategy == "history_recall" and plan.history_context:
             hist_texts = [h["text"] for h in plan.history_context[:5]]
             return "From our conversation, you mentioned: " + "; ".join(hist_texts) + "."
 
         if plan.strategy == "honest_missing":
-            return (
-                "I don't think you've told me that yet. "
-                "Would you like to share?"
-            )
+            return random.choice(self._HONEST_MISSING_TEMPLATES)
 
         if plan.strategy == "ask_confirm":
-            topics = [m["attribute"] for m in plan.needs_confirmation]
+            topics = [m["attribute"].replace("_", " ") for m in plan.needs_confirmation]
             return (
-                f"I have some information about {', '.join(topics)}, "
-                "but it's sensitive. Would you like me to share it?"
+                f"I do have some memories related to {', '.join(topics)}, "
+                "but that's sensitive stuff. Would you like me to share what I know?"
             )
 
         # Friendly fallback for general/greeting messages
         msg_lower = plan.user_message.lower().strip().rstrip("?!. ")
-        if any(g in msg_lower for g in ["hi", "hello", "hey", "howdy", "namaste", "hola"]):
-            return "Hey there! How's your day going? What would you like to chat about?"
+        if any(g in msg_lower for g in ["hi", "hello", "hey", "howdy", "namaste", "hola", "hii"]):
+            return random.choice(self._GREETING_TEMPLATES)
         if any(g in msg_lower for g in ["how are", "how r u", "kaise ho"]):
-            return "I'm doing great, thanks for asking! How about you? What's on your mind today?"
+            return "I'm doing great, thanks for asking! How about you? What's going on?"
         if any(g in msg_lower for g in ["bye", "goodbye", "see you", "take care"]):
-            return "Goodbye! It was great chatting with you. See you next time!"
-        if any(g in msg_lower for g in ["thanks", "thank you", "shukriya"]):
-            return "You're welcome! Happy to help. Anything else you'd like to talk about?"
+            return random.choice(self._FAREWELL_TEMPLATES)
+        if any(g in msg_lower for g in ["thanks", "thank you", "shukriya", "dhanyawad"]):
+            return "You're welcome! Happy to help. Anything else on your mind?"
         return "I'm here! What would you like to talk about?"
 
     def get_history(self, user_id: str) -> list[dict]:

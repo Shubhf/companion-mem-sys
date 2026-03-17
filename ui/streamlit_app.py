@@ -231,6 +231,45 @@ def create_new_chat(user_id: str) -> str:
     return chat_id
 
 
+def _build_embed_fn():
+    """
+    Build embedding function using Gemini's text-embedding-004.
+    Same API key, no extra cost on free tier.
+    Returns a function: text -> list[float] (768 dims)
+    """
+    try:
+        from google import genai
+
+        api_key = None
+        try:
+            api_key = st.secrets["GEMINI_API_KEY"]
+        except Exception:
+            api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            return None
+
+        client = genai.Client(api_key=api_key)
+
+        def embed_fn(text: str) -> list[float]:
+            resp = client.models.embed_content(
+                model="text-embedding-004",
+                contents=text,
+            )
+            return resp.embeddings[0].values
+
+        # Quick test
+        test = embed_fn("hello")
+        if test and len(test) > 0:
+            st.session_state.embed_status = f"Gemini Embeddings ({len(test)}d)"
+            return embed_fn
+
+    except Exception as e:
+        pass
+
+    st.session_state.embed_status = "No embeddings"
+    return None
+
+
 def init_session():
     if "store" not in st.session_state:
         db_path = str(PROJECT_ROOT / "memories_ui.db")
@@ -249,8 +288,9 @@ def init_session():
 
     if "manager" not in st.session_state:
         llm_fn = _build_llm_fn()
+        embed_fn = _build_embed_fn()
         st.session_state.manager = ConversationManager(
-            store=st.session_state.store, llm_fn=llm_fn,
+            store=st.session_state.store, llm_fn=llm_fn, embed_fn=embed_fn,
         )
 
     if "current_user" not in st.session_state:

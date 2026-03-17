@@ -37,7 +37,31 @@ class MemoryIngestionPipeline:
         self.store = store
         self.embed_fn = embed_fn
         self.sensitive_policy = SensitivePolicy()
-        self.llm_extract_fn = llm_extract_fn or self._rule_based_extract
+
+        # Build extraction chain: LLM (if available) → rule-based fallback
+        self._llm_fn = llm_extract_fn
+        self._rule_fn = self._rule_based_extract
+
+        # Try to auto-detect Gemini extractor if no llm_extract_fn provided
+        if not self._llm_fn:
+            try:
+                from memory_engine.llm_extractor import create_gemini_extractor
+                self._llm_fn = create_gemini_extractor()
+            except Exception:
+                pass
+
+        self.llm_extract_fn = self._chained_extract
+
+    def _chained_extract(self, message: str) -> list[dict]:
+        """Try LLM extraction first, fall back to rule-based."""
+        if self._llm_fn:
+            try:
+                results = self._llm_fn(message)
+                if results:  # LLM returned facts
+                    return results
+            except Exception:
+                pass  # Fall through to rule-based
+        return self._rule_fn(message)
 
     def ingest(
         self, user_id: str, message: str, source: str = "user_message"
@@ -565,6 +589,68 @@ class MemoryIngestionPipeline:
             return [{
                 "entity": "user",
                 "attribute": "preference",
+                "value": m.group(2).strip(),
+                "is_correction": True,
+            }]
+
+        # Pattern: "Ab X Y hai" / "Ab se X yaad rakhna" (Hinglish "now X is Y")
+        m = re.search(
+            r"(?:ab\s+(?:se\s+)?|now\s+)(\w+)\s+(?:hai|is|yaad\s+rakhna|remember)",
+            message, re.IGNORECASE
+        )
+        if m:
+            val = m.group(1).strip()
+            # Try to figure out the attribute from context
+            attr = "update"
+            if any(w in msg_lower for w in ["nickname", "naam", "name", "bolna"]):
+                attr = "nickname"
+            elif any(w in msg_lower for w in ["captain", "role", "position"]):
+                attr = "role"
+            elif any(w in msg_lower for w in ["crush", "girlfriend", "gf", "bf", "boyfriend"]):
+                attr = "relationship"
+            return [{
+                "entity": "user",
+                "attribute": attr,
+                "value": val,
+                "is_correction": True,
+            }]
+
+        # Pattern: "Pehle X tha/thi, ab Y hai" (Before X, now Y)
+        m = re.search(
+            r"pehle\s+(?:main\s+|mera\s+)?(?:\w+\s+)?(\w+)\s+(?:tha|thi|the)[\.,]?\s*"
+            r"(?:but\s+|lekin\s+|par\s+)?ab\s+(\w[\w\s]*?)\s+(?:hai|hoon|leta|leti|karta|karti)",
+            message, re.IGNORECASE
+        )
+        if m:
+            return [{
+                "entity": "user",
+                "attribute": "routine",
+                "value": m.group(2).strip(),
+                "is_correction": True,
+            }]
+
+        # Pattern: "Divya ab meri girlfriend hai, crush nahi"
+        m = re.search(
+            r"(\w+)\s+(?:ab\s+)?(?:meri|mera)\s+(\w+)\s+(?:hai|hain)[\.,]?\s*(?:\w+\s+)?(?:nahi|not|mat)",
+            message, re.IGNORECASE
+        )
+        if m:
+            return [{
+                "entity": m.group(1).strip().lower(),
+                "attribute": "relationship",
+                "value": m.group(2).strip(),
+                "is_correction": True,
+            }]
+
+        # Pattern: "Mera nickname X hai" (simple Hinglish assignment that implies correction)
+        m = re.search(
+            r"(?:mera|meri)\s+(\w+)\s+(\w+)\s+hai[\.,]?\s*(?:.*?)(?:ab\s+se|yaad\s+rakh)",
+            message, re.IGNORECASE
+        )
+        if m:
+            return [{
+                "entity": "user",
+                "attribute": m.group(1).strip().lower(),
                 "value": m.group(2).strip(),
                 "is_correction": True,
             }]

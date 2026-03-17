@@ -24,7 +24,7 @@ from memory_engine.memory_schema import (
     MemoryEntry, MemoryStatus, MemoryType, SensitivityLevel
 )
 
-EMBEDDING_DIM = 384  # Default for all-MiniLM-L6-v2
+EMBEDDING_DIM = 768  # Gemini text-embedding-004
 
 
 class TursoHTTPConnection:

@@ -45,8 +45,9 @@ async def startup():
     global store, manager
     store = MemoryStore(db_path="memories.db")
 
-    # Try to load Gemini LLM
+    # Try to load Gemini LLM + embeddings
     llm_fn = None
+    embed_fn = None
     try:
         from llm_provider import create_gemini_llm_fn
         llm_fn = create_gemini_llm_fn()
@@ -54,7 +55,24 @@ async def startup():
     except Exception as e:
         print(f"Running without LLM (Gemini not available: {e})")
 
-    manager = ConversationManager(store=store, llm_fn=llm_fn)
+    try:
+        import os
+        from google import genai
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if api_key:
+            client = genai.Client(api_key=api_key)
+            def embed_fn(text: str) -> list[float]:
+                resp = client.models.embed_content(
+                    model="text-embedding-004", contents=text,
+                )
+                return resp.embeddings[0].values
+            embed_fn("test")  # health check
+            print("Gemini embeddings loaded")
+    except Exception as e:
+        embed_fn = None
+        print(f"Running without embeddings: {e}")
+
+    manager = ConversationManager(store=store, llm_fn=llm_fn, embed_fn=embed_fn)
 
 
 @app.post("/chat", response_model=ChatResponse)
