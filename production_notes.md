@@ -29,12 +29,12 @@
 | Embedding (local model) | ~$0 | Runs on inference server, amortized |
 | Embedding (API, e.g., OpenAI) | ~$0.0001/msg | ~500 tokens/message |
 | SQLite storage | ~$0 | Local, no per-query cost |
-| LLM generation (Claude Haiku) | ~$0.001-0.003/msg | ~500 input + 200 output tokens |
-| LLM generation (Claude Sonnet) | ~$0.005-0.015/msg | Higher quality, higher cost |
+| LLM generation (Gemini Flash) | ~$0.001-0.003/msg | ~500 input + 200 output tokens |
+| LLM generation (Gemini Pro) | ~$0.005-0.015/msg | Higher quality, higher cost |
 
 **Estimated cost per active user per month** (assuming 50 messages/day):
-- With Haiku: ~$1.50-4.50/month
-- With Sonnet: ~$7.50-22.50/month
+- With Gemini Flash: ~$1.50-4.50/month
+- With Gemini Pro: ~$7.50-22.50/month
 - Without LLM (rule-based): ~$0 (compute only)
 
 ### Cost Control
