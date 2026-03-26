@@ -553,6 +553,33 @@ class MemoryIngestionPipeline:
                 "is_correction": False,
             }]
 
+        # Pattern: "now it is reduced/dropped to X" / "it is now X" (pronoun-based numeric update)
+        m = re.search(
+            r"(?:now\s+)?(?:it|ye|yeh|wo|woh)\s+(?:is\s+)?(?:reduced|dropped|down|came\s+down|decreased|increased|gone\s+up|went\s+up)?\s*(?:to\s+)?(\d+[\.\d]*)(?:\s*(?:kg|kgs|lbs|pounds|cm|ft|feet|inches))?",
+            message, re.IGNORECASE
+        )
+        if m:
+            val = m.group(1).strip()
+            # Detect what "it" refers to from context or use generic
+            attr = "update"
+            attr_keywords = {
+                "weight": ["weight", "wajan", "wazan", "vajan", "kg", "kgs", "lbs", "pounds", "reduced", "dropped"],
+                "age": ["age", "umar", "umr", "birthday", "turned"],
+                "salary": ["salary", "pay", "income", "tankhwah", "ctc", "package"],
+                "height": ["height", "lambai", "kad", "cm", "ft", "feet", "inches"],
+                "score": ["score", "marks", "grade", "number", "percentage", "cgpa"],
+            }
+            for attr_name, keywords in attr_keywords.items():
+                if any(w in msg_lower for w in keywords):
+                    attr = attr_name
+                    break
+            return [{
+                "entity": "user",
+                "attribute": attr,
+                "value": val,
+                "is_correction": True,
+            }]
+
         # Pattern: "I switched to X, Y was giving me problems"
         m = re.search(
             r"(?:i\s+)?(?:switched|changed|moved)\s+to\s+(.+?)[,\.]",
@@ -621,6 +648,19 @@ class MemoryIngestionPipeline:
                 "is_correction": True,
             }]
 
+        # Pattern: "Mera X ab Y hai" / "mera weight ab 70 hai" (subject + ab + value)
+        m = re.search(
+            r"(?:my|mera|meri)\s+(\w+)\s+(?:ab|now)\s+(\w+)\s*(?:hai|h|he|hain|is)?[\.,!?]?$",
+            message, re.IGNORECASE
+        )
+        if m:
+            return [{
+                "entity": "user",
+                "attribute": m.group(1).strip().lower(),
+                "value": m.group(2).strip(),
+                "is_correction": True,
+            }]
+
         # Pattern: "Ab X Y hai" / "Ab se X yaad rakhna" (Hinglish "now X is Y")
         m = re.search(
             r"(?:ab\s+(?:se\s+)?|now\s+)(\w+)\s+(?:hai|h|he|hain|is|yaad\s+rakhna|remember)",
@@ -630,12 +670,20 @@ class MemoryIngestionPipeline:
             val = m.group(1).strip()
             # Try to figure out the attribute from context
             attr = "update"
-            if any(w in msg_lower for w in ["nickname", "naam", "name", "bolna"]):
-                attr = "nickname"
-            elif any(w in msg_lower for w in ["captain", "role", "position"]):
-                attr = "role"
-            elif any(w in msg_lower for w in ["crush", "girlfriend", "gf", "bf", "boyfriend"]):
-                attr = "relationship"
+            attr_keywords = {
+                "nickname": ["nickname", "naam", "name", "bolna"],
+                "role": ["captain", "role", "position"],
+                "relationship": ["crush", "girlfriend", "gf", "bf", "boyfriend"],
+                "weight": ["weight", "wajan", "wazan", "vajan"],
+                "age": ["age", "umar", "umr"],
+                "salary": ["salary", "pay", "income", "tankhwah"],
+                "height": ["height", "lambai", "kad"],
+                "score": ["score", "marks", "grade"],
+            }
+            for attr_name, keywords in attr_keywords.items():
+                if any(w in msg_lower for w in keywords):
+                    attr = attr_name
+                    break
             return [{
                 "entity": "user",
                 "attribute": attr,
@@ -643,16 +691,44 @@ class MemoryIngestionPipeline:
                 "is_correction": True,
             }]
 
-        # Pattern: "Pehle X tha/thi, ab Y hai" (Before X, now Y)
+        # Pattern: "Mera X pehle Y tha, ... ab Z hai" (temporal update with subject)
+        m = re.search(
+            r"(?:mera|meri|my)\s+(\w+)\s+pehle\s+[\w\s,]+?ab\s+(\w+)\s+(?:hai|h|he|hain)",
+            message, re.IGNORECASE
+        )
+        if m:
+            attr = m.group(1).strip().lower()
+            return [{
+                "entity": "user",
+                "attribute": attr,
+                "value": m.group(2).strip(),
+                "is_correction": True,
+            }]
+
+        # Pattern: "Pehle X tha/thi, ab Y hai" (Before X, now Y — no subject)
         m = re.search(
             r"pehle\s+(?:main\s+|mera\s+)?(?:\w+\s+)?(\w+)\s+(?:tha|thi|the)[\.,]?\s*"
             r"(?:but\s+|lekin\s+|par\s+)?ab\s+(\w[\w\s]*?)\s+(?:hai|h|he|hain|hoon|leta|leti|karta|karti)",
             message, re.IGNORECASE
         )
         if m:
+            # Try to detect the subject/attribute from earlier in the message
+            attr = "routine"
+            attr_keywords = {
+                "weight": ["weight", "wajan", "wazan", "vajan"],
+                "age": ["age", "umar", "umr"],
+                "salary": ["salary", "pay", "income", "tankhwah"],
+                "height": ["height", "lambai", "kad"],
+                "score": ["score", "marks", "grade", "number"],
+                "rank": ["rank", "position"],
+            }
+            for attr_name, keywords in attr_keywords.items():
+                if any(w in msg_lower for w in keywords):
+                    attr = attr_name
+                    break
             return [{
                 "entity": "user",
-                "attribute": "routine",
+                "attribute": attr,
                 "value": m.group(2).strip(),
                 "is_correction": True,
             }]
@@ -832,9 +908,9 @@ class MemoryIngestionPipeline:
                 })
                 return facts
 
-        # "My X is Y" / "Mera X hai Y"
+        # "My X is Y" / "My X is now Y" / "Mera X hai Y"
         m = re.search(
-            r"(?:my|mera|meri|mere)\s+(\w[\w\s]*?)\s+(?:is|hai|h|he|hain|ka naam)\s+(.+?)[\.,!?]?$",
+            r"(?:my|mera|meri|mere)\s+(\w[\w\s]*?)\s+(?:is|hai|h|he|hain|ka naam)\s+(?:now\s+|ab\s+)?(.+?)[\.,!?]?$",
             sent, re.IGNORECASE
         )
         if m:
