@@ -68,7 +68,7 @@ QUERY_ATTRIBUTE_MAP = {
     "brother": ["sibling", "siblings", "brother", "new_sibling"],
     "sister": ["sibling", "siblings", "sister", "sibling_count"],
     "health": ["health", "medical_condition", "diagnosis", "allergy", "allergies"],
-    "weight": ["weight", "body_weight", "wajan", "wazan", "vajan"],
+    "weight": ["weight", "body_weight", "current_body_weight", "wajan", "wazan", "vajan"],
     "wajan": ["weight", "body_weight", "wajan", "wazan", "vajan"],
     "wazan": ["weight", "body_weight", "wajan", "wazan", "vajan"],
     "vajan": ["weight", "body_weight", "wajan", "wazan", "vajan"],

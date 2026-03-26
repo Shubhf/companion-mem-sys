@@ -64,16 +64,20 @@ class MemoryIngestionPipeline:
         return self._rule_fn(message)
 
     def ingest(
-        self, user_id: str, message: str, source: str = "user_message"
+        self, user_id: str, message: str, source: str = "user_message",
+        context_history: list[dict] | None = None,
     ) -> list[MemoryEntry]:
         """
         Main ingestion entry point.
-        1. Extract facts from message
-        2. Detect corrections
-        3. Check sensitivity
-        4. Store with embeddings
+        1. Resolve context from conversation history (pronouns, follow-ups)
+        2. Extract facts from message
+        3. Detect corrections
+        4. Check sensitivity
+        5. Store with embeddings
         """
-        raw_facts = self.llm_extract_fn(message)
+        # Resolve short follow-up messages using conversation context
+        resolved_message = self._resolve_with_context(message, context_history or [])
+        raw_facts = self.llm_extract_fn(resolved_message)
         entries = []
 
         for fact in raw_facts:
@@ -139,6 +143,89 @@ class MemoryIngestionPipeline:
             entries.append(entry)
 
         return entries
+
+    def _resolve_with_context(self, message: str, history: list[dict]) -> str:
+        """
+        Resolve short follow-up messages using conversation history.
+
+        Handles cases like:
+        - Bot: "Do you remember your weight?" → User: "its 70" → "my weight is 70"
+        - User told weight earlier → "now it is reduced to 70" → keep as-is (handled by patterns)
+        - "u are wrong it is my X" → correction pattern (keep as-is, handled by correction patterns)
+        """
+        if not history:
+            return message
+
+        msg_lower = message.strip().lower()
+
+        # Check for correction pattern first (these can be longer messages)
+        correction_prefixes = [
+            "u are wrong", "you are wrong", "that's wrong", "thats wrong",
+            "no no", "nahi", "galat", "wrong", "actually",
+        ]
+        is_correction = any(msg_lower.startswith(p) for p in correction_prefixes)
+
+        if is_correction:
+            # Look for "it is my X" pattern in the correction
+            m = re.match(
+                r".*?(?:it\s+is|its|it\'s|ye|yeh)\s+(?:my|mera|meri)\s+(?:current\s+)?(\w[\w\s]*?)[\.,!?]?$",
+                message, re.IGNORECASE
+            )
+            if m:
+                attr = m.group(1).strip().lower().replace(" ", "_")
+                # Find the last value that was stored (from recent extraction)
+                # Look in history for the last number or value mentioned
+                last_value = self._find_last_value_in_history(history)
+                if last_value:
+                    return f"my {attr} is {last_value}"
+
+            return message
+
+        # Skip pronoun resolution if the message is rich enough (has clear subject)
+        if len(msg_lower.split()) > 8:
+            return message
+
+        # Handle short pronoun messages: "its 70", "it is 70", "70 hai", "70"
+        m = re.match(
+            r"^(?:its|it\s+is|it\'s|ye|yeh|wo|woh)?\s*(\d+[\.\d]*)\s*(?:kg|kgs|lbs|cm|ft|years?|saal)?[\.,!?]?\s*(?:hai|h|he)?[\.,!?]?$",
+            msg_lower
+        )
+        if m:
+            value = m.group(1)
+            # Look at recent history to find what attribute was being discussed
+            attr = self._infer_attribute_from_history(history)
+            if attr:
+                return f"my {attr} is {value}"
+
+        return message
+
+    def _infer_attribute_from_history(self, history: list[dict]) -> str | None:
+        """Look at recent conversation to figure out what attribute is being discussed."""
+        # Search backward through history for clues
+        attr_keywords = {
+            "weight": ["weight", "wajan", "wazan", "vajan", "body weight", "kg"],
+            "age": ["age", "umar", "umr", "years old", "saal"],
+            "height": ["height", "lambai", "kad", "tall", "cm", "ft", "feet"],
+            "salary": ["salary", "pay", "income", "tankhwah", "ctc", "package"],
+            "score": ["score", "marks", "grade", "cgpa", "percentage"],
+            "rank": ["rank", "position"],
+        }
+
+        for msg in reversed(history[-6:]):
+            text = msg.get("content", "").lower()
+            for attr, keywords in attr_keywords.items():
+                if any(kw in text for kw in keywords):
+                    return attr
+        return None
+
+    def _find_last_value_in_history(self, history: list[dict]) -> str | None:
+        """Find the last numeric value mentioned in recent history."""
+        for msg in reversed(history[-4:]):
+            if msg.get("role") == "user":
+                m = re.search(r'\b(\d+[\.\d]*)\b', msg.get("content", ""))
+                if m:
+                    return m.group(1)
+        return None
 
     def _handle_correction(
         self, user_id: str, entity: str, attribute: str, new_entry: MemoryEntry
