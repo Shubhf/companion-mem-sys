@@ -593,9 +593,37 @@ class MemoryIngestionPipeline:
                 "is_correction": True,
             }]
 
+        # Pattern: "Ab se mera naam/name X hai/h" (Hinglish correction with full phrase)
+        m = re.search(
+            r"(?:ab\s+(?:se\s+)?|now\s+)(?:mera|meri|my)\s+(?:naam|name)\s+(\w+)\s*(?:hai|h|he|hain|is)?[\.,!?]?$",
+            message, re.IGNORECASE
+        )
+        if m:
+            return [{
+                "entity": "user",
+                "attribute": "name",
+                "value": m.group(1).strip(),
+                "is_correction": True,
+            }]
+
+        # Pattern: "Ab se mera X Y hai/h" (Hinglish correction with attribute)
+        m = re.search(
+            r"(?:ab\s+(?:se\s+)?|now\s+)(?:mera|meri|my)\s+(\w+)\s+(\w+)\s*(?:hai|h|he|hain|is)?[\.,!?]?$",
+            message, re.IGNORECASE
+        )
+        if m:
+            attr = m.group(1).strip().lower()
+            val = m.group(2).strip()
+            return [{
+                "entity": "user",
+                "attribute": attr,
+                "value": val,
+                "is_correction": True,
+            }]
+
         # Pattern: "Ab X Y hai" / "Ab se X yaad rakhna" (Hinglish "now X is Y")
         m = re.search(
-            r"(?:ab\s+(?:se\s+)?|now\s+)(\w+)\s+(?:hai|is|yaad\s+rakhna|remember)",
+            r"(?:ab\s+(?:se\s+)?|now\s+)(\w+)\s+(?:hai|h|he|hain|is|yaad\s+rakhna|remember)",
             message, re.IGNORECASE
         )
         if m:
@@ -618,7 +646,7 @@ class MemoryIngestionPipeline:
         # Pattern: "Pehle X tha/thi, ab Y hai" (Before X, now Y)
         m = re.search(
             r"pehle\s+(?:main\s+|mera\s+)?(?:\w+\s+)?(\w+)\s+(?:tha|thi|the)[\.,]?\s*"
-            r"(?:but\s+|lekin\s+|par\s+)?ab\s+(\w[\w\s]*?)\s+(?:hai|hoon|leta|leti|karta|karti)",
+            r"(?:but\s+|lekin\s+|par\s+)?ab\s+(\w[\w\s]*?)\s+(?:hai|h|he|hain|hoon|leta|leti|karta|karti)",
             message, re.IGNORECASE
         )
         if m:
@@ -631,7 +659,7 @@ class MemoryIngestionPipeline:
 
         # Pattern: "Divya ab meri girlfriend hai, crush nahi"
         m = re.search(
-            r"(\w+)\s+(?:ab\s+)?(?:meri|mera)\s+(\w+)\s+(?:hai|hain)[\.,]?\s*(?:\w+\s+)?(?:nahi|not|mat)",
+            r"(\w+)\s+(?:ab\s+)?(?:meri|mera)\s+(\w+)\s+(?:hai|h|he|hain)[\.,]?\s*(?:\w+\s+)?(?:nahi|not|mat)",
             message, re.IGNORECASE
         )
         if m:
@@ -644,7 +672,7 @@ class MemoryIngestionPipeline:
 
         # Pattern: "Mera nickname X hai" (simple Hinglish assignment that implies correction)
         m = re.search(
-            r"(?:mera|meri)\s+(\w+)\s+(\w+)\s+hai[\.,]?\s*(?:.*?)(?:ab\s+se|yaad\s+rakh)",
+            r"(?:mera|meri)\s+(\w+)\s+(\w+)\s+(?:hai|h|he|hain)[\.,]?\s*(?:.*?)(?:ab\s+se|yaad\s+rakh)",
             message, re.IGNORECASE
         )
         if m:
@@ -744,11 +772,24 @@ class MemoryIngestionPipeline:
                 })
                 return facts
 
-        # "My name is Y" (user's own name — check first)
+        # "My name is Y" / "Mera naam Y hai/h" (user's own name — check first)
+        # English order: my name is X
         m = re.search(
-            r"(?:my|mera|meri)\s+name\s+(?:is|hai)\s+(\w+)",
+            r"(?:my|mera|meri)\s+(?:name|naam)\s+(?:is|hai|h|he|hain)\s+(\w+)",
             sent, re.IGNORECASE
         )
+        if not m:
+            # Hindi order: mera naam X hai/h (verb must be a separate word)
+            m = re.search(
+                r"(?:my|mera|meri)\s+(?:name|naam)\s+(\w+)\s+(?:hai|h|he|hain|is)[\.,!?]?$",
+                sent, re.IGNORECASE
+            )
+        if not m:
+            # Bare form: mera naam X (no verb)
+            m = re.search(
+                r"(?:my|mera|meri)\s+(?:name|naam)\s+(\w+)[\.,!?]?$",
+                sent, re.IGNORECASE
+            )
         if m:
             facts.append({
                 "entity": "user",
@@ -760,7 +801,7 @@ class MemoryIngestionPipeline:
 
         # "My X's name is Y" / "My X is named Y" (possessive — crush's name, dog's name)
         m = re.search(
-            r"(?:my|mera|meri|mere)\s+(\w+)(?:'s)?\s+(?:name\s+is|is\s+named|is\s+called|naam\s+hai|naam)\s+(\w+)",
+            r"(?:my|mera|meri|mere)\s+(\w+)(?:'s)?\s+(?:name\s+is|is\s+named|is\s+called|naam\s+(?:hai|h|he|hain)|naam)\s+(\w+)",
             sent, re.IGNORECASE
         )
         if m:
@@ -776,7 +817,7 @@ class MemoryIngestionPipeline:
 
         # "X name is Y" / "X ka naam Y hai" (without "my" prefix — e.g. "crush name is Ira")
         m = re.search(
-            r"^(\w[\w\s]*?)\s+(?:name\s+is|ka\s+naam|naam\s+hai)\s+(\w+)",
+            r"^(\w[\w\s]*?)\s+(?:name\s+is|ka\s+naam|naam\s+(?:hai|h|he|hain))\s+(\w+)",
             sent, re.IGNORECASE
         )
         if m:
@@ -793,7 +834,7 @@ class MemoryIngestionPipeline:
 
         # "My X is Y" / "Mera X hai Y"
         m = re.search(
-            r"(?:my|mera|meri|mere)\s+(\w[\w\s]*?)\s+(?:is|hai|hain|ka naam)\s+(.+?)[\.,!?]?$",
+            r"(?:my|mera|meri|mere)\s+(\w[\w\s]*?)\s+(?:is|hai|h|he|hain|ka naam)\s+(.+?)[\.,!?]?$",
             sent, re.IGNORECASE
         )
         if m:
