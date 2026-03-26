@@ -178,12 +178,37 @@ class MemoryRetriever:
         self.embed_fn = embed_fn
         self.sensitive_policy = SensitivePolicy()
 
+    # Patterns that mean "tell me everything you know about me"
+    _BROAD_QUERY_PATTERNS = [
+        r"what\s+(?:do\s+)?(?:you|u)\s+know\s+(?:about|abt)\s+me",
+        r"what\s+(?:all\s+)?(?:do\s+)?(?:you|u)\s+remember",
+        r"tell\s+me\s+(?:everything|all)\s+(?:you|u)\s+know",
+        r"(?:kya|sab)\s+(?:yaad|pata)\s+hai",
+        r"(?:what|sab)\s+(?:do\s+)?(?:you|u)\s+know\s+(?:about|abt)\s+me",
+        r"what\s+(?:have\s+)?(?:you|u)\s+(?:learned|learnt)\s+(?:about|abt)\s+me",
+        r"do\s+(?:you|u)\s+(?:know|remember)\s+(?:anything|something)\s+(?:about|abt)\s+me",
+    ]
+
+    def _is_broad_query(self, text: str) -> bool:
+        """Check if the query is asking for all known info about the user."""
+        text_lower = text.lower().strip()
+        return any(re.search(p, text_lower) for p in self._BROAD_QUERY_PATTERNS)
+
     def retrieve(self, query: MemoryQuery) -> list[tuple[MemoryEntry, float]]:
         """
         Retrieve ranked memories for a query.
         Returns list of (memory, score) tuples sorted by relevance.
         """
         candidates = []
+
+        # 0. Broad query: "what do you know about me?" → return all user memories
+        if self._is_broad_query(query.query_text):
+            all_memories = self.store.get_by_user(query.user_id, MemoryStatus.ACTIVE)
+            for mem in all_memories:
+                candidates.append((mem, "entity_match"))
+            scored = self._score_candidates(candidates, query)
+            filtered = self._filter_sensitive(scored)
+            return filtered[:query.top_k]
 
         # 1. Direct entity match
         entities = self._extract_entities(query.query_text)

@@ -501,6 +501,17 @@ def _save_message(role: str, content: str, debug: dict = None):
 
 init_session()
 
+# Ensure conversation manager history is in sync with active chat
+# (Streamlit reruns the script on every interaction, so manager history can get lost)
+_active_msgs = _get_active_messages()
+_mgr_history = st.session_state.manager.get_history(st.session_state.current_user)
+if _active_msgs and not _mgr_history:
+    for msg in _active_msgs:
+        if msg["role"] in ("user", "assistant"):
+            st.session_state.manager._add_to_history(
+                st.session_state.current_user, msg["role"], msg["content"]
+            )
+
 
 # ============================================================
 #  SIDEBAR
