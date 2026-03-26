@@ -713,7 +713,7 @@ class MemoryIngestionPipeline:
         )
         if m:
             # Try to detect the subject/attribute from earlier in the message
-            attr = "routine"
+            attr = "status"
             attr_keywords = {
                 "weight": ["weight", "wajan", "wazan", "vajan"],
                 "age": ["age", "umar", "umr"],
@@ -721,6 +721,10 @@ class MemoryIngestionPipeline:
                 "height": ["height", "lambai", "kad"],
                 "score": ["score", "marks", "grade", "number"],
                 "rank": ["rank", "position"],
+                "role": ["captain", "leader", "manager", "boss"],
+                "routine": ["routine", "schedule", "daily"],
+                "diet": ["diet", "khana", "eating", "food"],
+                "hobby": ["hobby", "play", "game"],
             }
             for attr_name, keywords in attr_keywords.items():
                 if any(w in msg_lower for w in keywords):

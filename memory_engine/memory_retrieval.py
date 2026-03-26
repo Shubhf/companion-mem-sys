@@ -226,11 +226,28 @@ class MemoryRetriever:
         for mem in all_memories:
             if mem.memory_id in {c[0].memory_id for c in candidates}:
                 continue
-            # Check if query keywords appear in memory value or attribute
-            mem_text = f"{mem.entity} {mem.attribute} {mem.value}".lower()
-            overlap = query_words & set(re.findall(r'\b\w+\b', mem_text))
-            if overlap:
+            # Check overlap with entity and attribute (strong signal)
+            entity_attr_text = f"{mem.entity} {mem.attribute}".lower()
+            entity_attr_words = set(re.findall(r'\b\w+\b', entity_attr_text))
+            ea_overlap = query_words & entity_attr_words
+            if ea_overlap:
                 candidates.append((mem, "keyword_match"))
+                continue
+            # Check overlap with value
+            value_words = set(re.findall(r'\b\w+\b', mem.value.lower()))
+            value_overlap = query_words & value_words
+            if value_overlap:
+                # If the value IS the query word (exact or primary value), it's a strong match
+                # e.g., friend: "Rakesh" matches "who is Rakesh?"
+                # But "role: captain Arjun" shouldn't match "who is Arjun?" (Arjun is incidental)
+                value_core = mem.value.strip().lower()
+                value_core_words = set(re.findall(r'\b\w+\b', value_core))
+                # Strong match: query word is the entire value or the value is a single word
+                if len(value_core_words) == 1 and value_overlap:
+                    candidates.append((mem, "keyword_match"))
+                # Strong match: 2+ overlapping words
+                elif len(value_overlap) >= 2:
+                    candidates.append((mem, "keyword_match"))
 
         # 4. Semantic similarity via FAISS
         if self.embed_fn:
